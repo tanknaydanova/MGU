@@ -4,21 +4,33 @@
 #include<stdlib.h> // для динамических массивов: malloc, free
 
 
-/*int Rearrange(..., L);
+int Rearrange(int Numbers[], const unsigned int Len);
 
 
-int Rearrange(..., L)
+int Rearrange(int Numbers[], const unsigned int Len)
 {
-	
-}*/
+  int F, L;
+  F=L=0;
+  //printf("Len %u\n", Len);
+  for(unsigned int n = 0; n<Len/2; n++)
+  {
+    // Можно альт. алгоритм по замене переменных
+    F = Numbers[n];
+    L = Numbers[Len-1-n];
+    //printf("Меняется пара №%u: %d, %d;\n",n,F,L); 
+    Numbers[Len-1-n] = F;
+    Numbers[n] = L;
+  }
+  return 0;
+}
 
 
 int main(void)
 {
 	/*
 	 *  Переставляет элементы массива в обратном порядке
-	 *  Ввод ограничен форматом, точнсть не ограничена
-	 *  Точность вывода 16 цифр после запятой
+	 *  Ввод ограничен форматом, точность не ограничена
+	 *  Точность вывода целых чисел
 	 *  Ввод рабочих данных без ошибок; проверки вида нет
 	 *  Наибольшая длинна имени файла расчитана на
 	 *  Windows API, файловую систему NTFS - 260 символов
@@ -26,16 +38,16 @@ int main(void)
 	unsigned int Q, Len;
 	FILE *pfIN, *pfOUT;
 	char fName[260];
-	int *Numbers;
+	int *Numbers = malloc(1);
 	Q = Len = 0;
 	printf("-------------main.c-------------\n");
 	printf("- - - - - Задача 2.2 - - - - -\n");
 	printf("Переставляет элементы массива в обратном порядке\n");
-	printf("Пусть в массиве вещественные числа\n");
+	printf("Пусть в массиве целые числа\n");
 	printf("Точность: 16 цифр после запятой\n");
 	
-	printf("Хотите ввести имя файла входных данных самостоятельно? (1/0)\n");
-	if(scanf("%ud", &Q)==1)
+	printf("Хотите ввести имя файла входных данных самостоятельно (1)? (0/1)\n");
+	if(scanf("%u", &Q)==1)
 	{
 	    if(Q==0)
 	    {
@@ -61,32 +73,40 @@ int main(void)
 			}
 	    if(pfIN != NULL) // Основной ход программы
 	    {
-			fscanf(pfIN,"%ud",&Len);
-			Numbers = malloc(Len*sizeof(int));
-			for(unsigned int N=0; N<sizeof(Numbers); N++)
+			fscanf(pfIN,"%u",&Len);
+			free(Numbers); // Незачем, см наверх
+			Numbers = /* (int*) */malloc(Len*sizeof(int));
+			for(unsigned int N=0; N<Len; N++)
+			// sizeof(Numbers) = длина указателя
+			// sizeof(int) = 4
 			{
 				fscanf(pfIN,"%d",&Numbers[N]);
 			}
-			/*if (Calculate(pfIN,&Middle)<0) // Запуск функции
-			{
-				return -1; // Ошибка в функции
-			}*/
+			Rearrange(Numbers, Len);
 			printf("Вывести ответ в файл (0) или на экран (1)? (0/1)\n");
-			if(scanf("%ud", &Q)==1)
+			if(scanf("%u", &Q)==1)
 			{
 				if(Q==0) // В файл
 				{
 					pfOUT = fopen("OUTPUT.txt","w");
 					if (pfOUT != NULL)
 					{
-						//fprintf(pfOUT, "%16lf\n", Middle);
+						for(unsigned int N = 0; N<Len; N++)
+						{
+						  fprintf(pfOUT, "%d ", Numbers[N]);
+						}
+						fprintf(pfOUT,"\n");
 						fclose(pfOUT);
 					} else {
 						return -1; // Файл вывода не открывается
 					}
 				} else if(Q==1) // На экран
 					{
-						//printf("Такое среднее равно %.16lf\n", Middle);
+						for(unsigned int N = 0; N<Len; N++)
+						{
+						  printf("%d ", Numbers[N]);
+						}
+						printf("\n");
 						//return 0;
 					} else {
 						return -1; // Ответ на II вопрос не 1 и не 0
